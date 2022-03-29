@@ -17,10 +17,10 @@ export const ProjectListScreen = () => {
   const client = useHttp();
   useEffect(() => {
     client("projects", { params: cleanObject(debouncedParam) }).then(setList);
-  }, [debouncedParam]);
+  }, [debouncedParam]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     client("users").then(setUsers);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div>
       <SearchPanel
