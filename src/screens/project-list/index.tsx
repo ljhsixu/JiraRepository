@@ -6,6 +6,8 @@ import { cleanObject, useDebounce } from "../../utils";
 import * as qs from "qs";
 import { useHttp } from "../../utils/http";
 import styled from "@emotion/styled";
+import { useAsync } from "../../utils/use-async";
+import { Typography } from "antd";
 const apiUrl = process.env.REACT_APP_API_URL;
 export const ProjectListScreen = () => {
   const [param, setParam] = useState({
@@ -14,10 +16,11 @@ export const ProjectListScreen = () => {
   });
   const [users, setUsers] = useState([]);
   const debouncedParam = useDebounce(param, 2000);
-  const [list, setList] = useState([]);
+
   const client = useHttp();
+  const { run, isLoading, error, data: list } = useAsync();
   useEffect(() => {
-    client("projects", { params: cleanObject(debouncedParam) }).then(setList);
+    run(client("projects", { params: cleanObject(debouncedParam) }));
   }, [debouncedParam]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     client("users").then(setUsers);
@@ -30,7 +33,10 @@ export const ProjectListScreen = () => {
         setParam={setParam}
         users={users}
       ></SearchPanel>
-      <List list={list} users={users}></List>
+      {error ? (
+        <Typography.Text type={"danger"}>{error.message} </Typography.Text>
+      ) : null}
+      <List users={users}></List>
     </Container>
   );
 };
